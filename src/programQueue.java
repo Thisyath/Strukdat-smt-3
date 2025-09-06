@@ -41,9 +41,7 @@ public class programQueue{
             front = (front + 1) % maxSize;
             count--;
             return temp;
-        }
-    
-        
+        } 
     }
     
     public void display(){
@@ -58,8 +56,7 @@ public class programQueue{
                 index = (index +1) %maxSize;
             }
             System.out.println("]");
-        }
-        
+        } 
     }
 
     public void swap() {
