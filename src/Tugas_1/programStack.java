@@ -1,11 +1,11 @@
 import java.util.Scanner;
 
-public class Stack {
+public class programStack {
     public String[] data;
     public int top;
     private final int maxSize;
 
-    public Stack(int size) {
+    public programStack(int size) {
         this.maxSize = size;
         this.data = new String[maxSize];
         this.top = -1;
@@ -58,7 +58,7 @@ public class Stack {
     }
 
     public static void main(String[] args) {
-        Stack stack = new Stack (10);
+        programStack stack = new programStack(10);
         Scanner scanner = new Scanner(System.in);
         int choice;
 
