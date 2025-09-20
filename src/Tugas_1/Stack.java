@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Stack {
     public String[] data;
     public int top;
-    private int maxSize;
+    private final int maxSize;
 
     public Stack(int size) {
         this.maxSize = size;

@@ -1,11 +1,11 @@
 import java.util.Scanner;
 
 public class programQueue{
-    private String[] data;
+    private final String[] data;
     private int front;
     private int rear;
     private int count;
-    private int maxSize;
+    private final int maxSize;
 
     public programQueue(int size) {
         this.maxSize = size;
