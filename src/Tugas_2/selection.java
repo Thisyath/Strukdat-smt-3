@@ -1,10 +1,5 @@
 package Tugas_2;
 
-/**
- * Implementasi algoritma Selection Sort
- * Konsep: Mencari elemen minimum dan menempatkannya di posisi yang tepat
- * Time Complexity: O(n²)
- */
 public class selection {
 
     public void sort(int[] arr) {

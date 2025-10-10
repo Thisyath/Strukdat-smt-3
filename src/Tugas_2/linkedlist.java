@@ -1,9 +1,5 @@
 package Tugas_2;
 
-/**
- * Implementasi LinkedList sederhana untuk keperluan tambahan
- * (Opsional - bisa digunakan untuk implementasi sorting pada linked list)
- */
 public class linkedlist {
 
     private Node head;

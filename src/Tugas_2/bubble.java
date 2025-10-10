@@ -1,10 +1,5 @@
 package Tugas_2;
 
-/**
- * Implementasi algoritma Bubble Sort
- * Konsep: Membandingkan elemen bersebelahan dan menukar jika tidak urut
- * Time Complexity: O(n²)
- */
 public class bubble {
 
     public void sort(int[] arr) {

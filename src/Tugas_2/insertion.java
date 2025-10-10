@@ -1,10 +1,5 @@
 package Tugas_2;
 
-/**
- * Implementasi algoritma Insertion Sort
- * Konsep: Menyisipkan setiap elemen ke posisi yang tepat dalam bagian terurut
- * Time Complexity: O(n²) worst case, O(n) best case
- */
 public class insertion {
 
     public void sort(int[] arr) {
