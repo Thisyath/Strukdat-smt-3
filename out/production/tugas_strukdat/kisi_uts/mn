@@ -1,0 +1,186 @@
+package  kisi_uts;
+
+/*
+ * Kerjakan semua yang bertanda `[SOAL #]`. Gunakan Java 8+.
+ */
+
+import java.util.ArrayList;
+class Request implements Comparable<Request> {
+    private String operator;       // contoh: "Bright Gas Retail"
+    private String ticketNumber;   // contoh: "APP-01234"
+    private String commodity;      // contoh: "LPG 12kg"
+    private int allocationYear;    // contoh: 2025
+    public Request(String operator, String ticketNumber, String commodity, int allocationYear) {
+        this.operator = operator;
+        this.ticketNumber = ticketNumber;
+        this.commodity = commodity;
+        this.allocationYear = allocationYear;
+    }
+    public String getTicketNumber() { return ticketNumber; }
+    public String getOperator() { return operator; }
+    public String getCommodity() { return commodity; }
+    public int getAllocationYear() { return allocationYear; }
+    private int numericTicket() {
+        // [SOAL 1.1] Ambil bagian angka setelah tanda '-' lalu ubah ke integer
+        // Petunjuk: cari indeks '-', ambil substring setelahnya, lalu parse ke int.
+        return Integer.parseInt(ticketNumber.substring(ticketNumber.indexOf('-') +1));
+    }
+    @Override
+    public int compareTo(Request o) {
+        // [SOAL 1.1] Bandingkan berdasarkan numericTicket() ascending
+        return this.numericTicket() - o.numericTicket();
+    }
+    @Override
+    public String toString() {
+        // [SOAL 1.2]
+        // TODO: "Operator - Commodity (TicketNumber) - AllocationYear"
+        return operator + " - " + commodity + " (" + ticketNumber + ") + allocationYear";
+    }
+}
+class Node {
+    Request data;
+    Node next;
+    Node(Request d) { this.data = d; }
+}
+class SortedLinkedList {
+    private Node head;
+    public SortedLinkedList() {
+        this.head = null;
+    }
+    // [SOAL 2] Sisipkan terurut; return true jika node baru, false jika replace duplikat atau null
+    public boolean insertRequest(Request r) {
+        // [SOAL 2.1] Null handling
+        if (r == null) return false;
+
+        // Cek duplikat dan/atau posisi sisip
+        Node prev = null, curr = head;
+        while (curr != null) {
+            int cmp  = r.compareTo(curr.data);
+            if (cmp == 0) {
+                curr.data = r;
+                return false;
+            }
+            if (cmp < 0) break;
+            prev = curr;
+            curr = curr.next;
+        }
+        // Sisipkan pada posisi yang tepat agar ascending
+        Node newNode = new Node(r);
+        if (prev == null) {
+            newNode.next = head;
+            head = newNode;
+        } else {
+           newNode.next = prev.next;
+           prev.next = newNode;
+        }
+        return true;
+    }
+    // [SOAL 3] Hapus node pertama dengan ticketNumber yang cocok
+    public boolean removeByTicket(String ticket) {
+        if (head == null) return false;
+
+        if (head.data.getTicketNumber().equals(ticket)){
+            head = head.next;
+            return true;
+        }
+
+        Node curr = head;
+        while (curr.next != null){
+            if (curr.next.data.getTicketNumber().equals(ticket)){
+                curr.next = curr.next.next;
+                return true;
+            }
+            curr = curr.next;
+        }
+        return false;
+    }
+    // [SOAL 4] Gabungkan 'this' dengan 'other' dengan menautkan ulang node yang ada.
+    // Setelah selesai, set other.head = null. Jika duplikat, pertahankan data di 'this'.
+    public void mergeFrom(SortedLinkedList other) {
+        if (other == null || other.head == null) return;
+
+        Node dummy = new Node (null);
+        Node tail = dummy;
+        Node c1 = this.head, c2 = other.head;
+
+        while (c1 != null && c2 != null) {
+            int cmp = c1.data.compareTo(c2.data);
+            if (cmp < 0) {
+                tail.next = c1;
+                c1 = c1.next;
+            } else if (cmp > 0) {
+                tail.next = c2;
+                c2 = c2.next;
+            } else {
+                tail.next = c1;
+                c1 = c1.next;
+                c2 = c2.next;
+            }
+            tail = tail.next;
+        }
+
+        tail.next = (c1 != null) ? c1 : c2;
+        this.head = dummy.next;
+        other.head = null;
+
+    }
+    // [SOAL 5] Kembalikan semua request di tahun tertentu
+    public ArrayList<Request> findByYear(int year) {
+        ArrayList<Request> res = new ArrayList<>();
+        Node curr = head;
+        while (curr != null) {
+            if (curr.data.getAllocationYear()== year){
+                res.add(curr.data);
+            }
+            curr = curr.next;
+
+        }
+        return res;
+    }
+    // [SOAL 6] Cetak semua request
+    public void displayRequests() {
+        System.out.println("=== Daftar Request Alokasi Energi ===");
+        Node curr = head;
+        int i = 1;
+        while (curr != null) {
+            System.out.println ("["+ i++ +"] "+ curr.data);
+            curr = curr.next;
+        }
+        System.out.println ("=======================================");
+    }
+    public int countRequests() {
+        int count = 0;
+        Node curr = head;
+        while (curr != null) {
+            count++;
+            curr = curr.next;
+        }
+        return count;
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        SortedLinkedList a = new SortedLinkedList();
+        // Data awal
+        a.insertRequest(new Request("Bright Gas Retail", "APP-00542", "LPG 12kg", 2025));
+        a.insertRequest(new Request("Energi Nusantara", "APP-01203", "LPG 50kg", 2025));
+        a.insertRequest(new Request("Prima Gas", "APP-00103", "LPG 12kg", 2025));
+        a.insertRequest(new Request("Samudra LNG", "APP-01888", "LNG", 2025));
+        // Duplikat: seharusnya replace, bukan menambah ukuran
+        a.insertRequest(new Request("Prima Gas+", "APP-00103", "LPG 12kg", 2026));
+        // Penghapusan
+        a.removeByTicket("APP-01888"); // hapus Samudra LNG
+        // List kedua untuk merge
+        SortedLinkedList b = new SortedLinkedList();
+        b.insertRequest(new Request("Mandiri Gas", "APP-00009", "LPG 3kg", 2025));
+        b.insertRequest(new Request("Kirana Energi", "APP-01777", "LPG 12kg", 2025));
+        b.insertRequest(new Request("Energi Nusantara+", "APP-01203", "LPG 50kg", 2026)); // duplikat saat merge
+        // Gabungkan
+        a.mergeFrom(b);
+        // Tampilkan
+        a.displayRequests();
+        System.out.println("Total: " + a.countRequests() + " requests");
+        // Cari berdasarkan tahun
+        System.out.println("Data tahun 2025: " + a.findByYear(2025).size() + " request(s)");
+    }
+}
