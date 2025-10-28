@@ -1,32 +1,41 @@
 package Tugas_4;
 
+import java.util.ArrayList;
+
 class BinarySearchTree {
     Node root;
+    private ArrayList<Character> insertOrder; // To track insertion order (updated after insert/remove)
 
     BinarySearchTree() {
         root = null;
+        insertOrder = new ArrayList<>();
     }
 
     // Insert a key
     void insert(char key) {
-        root = insertRec(root, key);
+        Node newNode = insertRec(root, key);
+        if (newNode != null) { // Insert successful (not duplicate)
+            insertOrder.add(key);
+        }
+        root = newNode != null ? newNode : root; // Update root if changed
     }
 
     Node insertRec(Node root, char key) {
         if (root == null) {
-            root = new Node(key);
-            return root;
+            return new Node(key);
         }
         if (key < root.key)
             root.left = insertRec(root.left, key);
         else if (key > root.key)
             root.right = insertRec(root.right, key);
+        // If key == root.key, do nothing (no duplicates)
         return root;
     }
 
     // Remove a key
     void remove(char key) {
         root = removeRec(root, key);
+        insertOrder.remove(Character.valueOf(key)); // Remove from insertion order list if exists
     }
 
     Node removeRec(Node root, char key) {
@@ -96,6 +105,15 @@ class BinarySearchTree {
             postOrderRec(root.right);
             System.out.print(root.key + " ");
         }
+    }
+
+    // Get keys in insertion order (updated after insert/remove)
+    public char[] getInsertOrder() {
+        char[] insertArray = new char[insertOrder.size()];
+        for (int i = 0; i < insertOrder.size(); i++) {
+            insertArray[i] = insertOrder.get(i);
+        }
+        return insertArray;
     }
 
     // Visualize the tree with ASCII art and colors (using ANSI escape codes)
