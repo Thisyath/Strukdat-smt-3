@@ -1,13 +1,13 @@
 package Tugas_5;
 
 class Node {
-    char key;
+    int key;
     Node left, right, parent;
     boolean isRed;  // true = RED, false = BLACK
 
-    public Node(char key) {
+    Node(int key) {
         this.key = key;
-        this.isRed = true;     // node baru selalu merah
+        this.isRed = true;
         this.left = this.right = this.parent = null;
     }
 }

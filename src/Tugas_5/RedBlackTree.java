@@ -1,16 +1,16 @@
 package Tugas_5;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RedBlackTree {
     private Node root;
     private final Node NIL;
-    private final ArrayList<Character> insertOrder = new ArrayList<>();
+    private final ArrayList<Integer> insertOrder = new ArrayList<>();
 
     public RedBlackTree() {
-        NIL = new Node('\0');
+        NIL = new Node(0);
         NIL.isRed = false;
-        NIL.left = NIL.right = NIL.parent = NIL;
         root = NIL;
     }
 
@@ -19,10 +19,7 @@ public class RedBlackTree {
         insertOrder.clear();
     }
 
-    public boolean insert(char key) {
-        key = Character.toUpperCase(key);
-        if (key < 'A' || key > 'Z') return false;
-
+    public boolean insert(int key) {
         Node z = new Node(key);
         Node y = NIL;
         Node x = root;
@@ -31,7 +28,7 @@ public class RedBlackTree {
             y = x;
             if (z.key < x.key) x = x.left;
             else if (z.key > x.key) x = x.right;
-            else return false; // duplikat
+            else return false;
         }
 
         z.parent = y;
@@ -39,37 +36,32 @@ public class RedBlackTree {
         else if (z.key < y.key) y.left = z;
         else y.right = z;
 
-        z.left = NIL;
-        z.right = NIL;
+        z.left = z.right = NIL;
         insertOrder.add(key);
-
-        fixInsert(z);  // ini yang diperbaiki total
+        fixInsert(z);
         return true;
     }
 
     private void fixInsert(Node z) {
-        while (z.parent.isRed) {
+        while (z.parent != NIL && z.parent.isRed) {
             if (z.parent == z.parent.parent.left) {
-                Node y = z.parent.parent.right; // uncle
+                Node y = z.parent.parent.right;
                 if (y.isRed) {
-                    // Case 1: uncle merah → recolor
                     z.parent.isRed = false;
                     y.isRed = false;
                     z.parent.parent.isRed = true;
                     z = z.parent.parent;
                 } else {
                     if (z == z.parent.right) {
-                        // Case 2: uncle hitam, z anak kanan → rotate left
                         z = z.parent;
                         leftRotate(z);
                     }
-                    // Case 3: uncle hitam, z anak kiri → recolor + right rotate
                     z.parent.isRed = false;
                     z.parent.parent.isRed = true;
                     rightRotate(z.parent.parent);
                 }
-            } else { // symmetric: parent adalah anak kanan grandparent
-                Node y = z.parent.parent.left; // uncle
+            } else {
+                Node y = z.parent.parent.left;
                 if (y.isRed) {
                     z.parent.isRed = false;
                     y.isRed = false;
@@ -86,7 +78,7 @@ public class RedBlackTree {
                 }
             }
         }
-        root.isRed = false; // root selalu hitam
+        root.isRed = false;
     }
 
     private void leftRotate(Node x) {
@@ -113,40 +105,49 @@ public class RedBlackTree {
         y.parent = x;
     }
 
-    public boolean contains(char key) {
-        key = Character.toUpperCase(key);
-        Node current = root;
-        while (current != NIL) {
-            if (key == current.key) return true;
-            current = key < current.key ? current.left : current.right;
+    public boolean contains(int key) {
+        Node curr = root;
+        while (curr != NIL) {
+            if (key == curr.key) return true;
+            curr = key < curr.key ? curr.left : curr.right;
         }
         return false;
     }
 
+    // VISUALISASI HORIZONTAL SEMPURNA (seperti buku)
     public void printTree() {
-        System.out.println("\n════════════════ RED-BLACK TREE ════════════════");
+        System.out.println("\n" + "═".repeat(70));
+        System.out.println(" ".repeat(30) + "RED-BLACK TREE");
+        System.out.println("═".repeat(70));
         if (root == NIL) {
-            System.out.println("                   (kosong)");
+            System.out.println(" ".repeat(32) + "(kosong)");
         } else {
-            printClassic(root, 0);
+            printNode(root, "", true);
         }
-        System.out.println("════════════════════════════════════════════════\n");
+        System.out.println("═".repeat(70) + "\n");
     }
 
-    private void printClassic(Node node, int depth) {
+    private void printNode(Node node, String prefix, boolean isTail) {
         if (node == NIL) return;
 
-        printClassic(node.right, depth + 1);
+        String nodeColor = node.isRed ? "\u001B[31m" : "\u001B[37m";
+        String reset = "\u001B[0m";
+        String label = nodeColor + node.key + reset;
 
-        for (int i = 0; i < depth; i++) System.out.print("     ");
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + label);
 
-        if (node == root) System.out.print("\u001B[1m"); // bold root
-        String color = node.isRed ? "\u001B[31m" : "\u001B[37m";
-        System.out.println(color + node.key + " (" + (node.isRed ? "R" : "B") + ")\u001B[0m");
+        List<Node> children = new ArrayList<>();
+        if (node.left != NIL) children.add(node.left);
+        if (node.right != NIL) children.add(node.right);
 
-        printClassic(node.left, depth + 1);
+        for (int i = 0; i < children.size(); i++) {
+            Node child = children.get(i);
+            String newPrefix = prefix + (isTail ? "    " : "│   ");
+            printNode(child, newPrefix, i == children.size() - 1);
+        }
     }
 
+    // Traversal
     public void preOrder()  { System.out.print("Pre-order  : "); preOrderRec(root);  System.out.println(); }
     private void preOrderRec(Node node)  { if (node != NIL) { System.out.print(node.key + " "); preOrderRec(node.left); preOrderRec(node.right); } }
 
@@ -159,7 +160,7 @@ public class RedBlackTree {
     public void printInsertOrder() {
         System.out.print("Urutan insert : ");
         if (insertOrder.isEmpty()) System.out.println("(kosong)");
-        else for (char c : insertOrder) System.out.print(c + " ");
+        else for (int k : insertOrder) System.out.print(k + " ");
         System.out.println();
     }
 
